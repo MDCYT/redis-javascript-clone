@@ -33,11 +33,11 @@ const server = net.createServer((socket) => {
     const commandRegex = /\$[0-9]+\r\n([a-zA-Z]+)\r\n/g
     const parametersRegex = /\$[0-9]+\r\n([a-zA-Z0-9.-]+)\r\n/g
 
-    const command = data.toString().trim().match(commandRegex)[0].split('\n')[1].replace('\r', '');
+    const command = data.toString().match(commandRegex)[0].split('\n')[1].replace('\r', '');
 
     let parameters = [];
 
-    data.toString().trim().match(parametersRegex).forEach((parameter) => {
+    data.toString().trim().match(parametersRegex)?.forEach((parameter) => {
       // First check the type of the parameter, example, string, number, boolean
       // $4 => type of data, in this case a string
       // $3 => Type of data, in this case a number

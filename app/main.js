@@ -1,9 +1,11 @@
 // Require dependencies
 const net = require("net");
 const fs = require("fs");
+const { join } = require("path");
 
-const commandsInterface = require("./interfaces/commands");
 const { defaultCommands, defaultValues, regex } = require("./interfaces/defaultvalues");
+
+global.__basedir = __dirname;
 
 const values = new Map();
 const expire = new Map();
@@ -18,7 +20,7 @@ for (let i = 0; i < process.argv.length; i++) {
 }
 
 // Require commands
-const commandFiles = fs.readdirSync("./commands").filter((file) => file.endsWith(".js"));
+const commandFiles = fs.readdirSync(join(__basedir, "commands")).filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);

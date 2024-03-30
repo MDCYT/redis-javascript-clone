@@ -37,7 +37,7 @@ const server = net.createServer((socket) => {
 
     let parameters = [];
 
-    data.toString().trim().match(parametersRegex)?.forEach((parameter) => {
+    data.toString().match(parametersRegex)?.forEach((parameter) => {
       // First check the type of the parameter, example, string, number, boolean
       // $4 => type of data, in this case a string
       // $3 => Type of data, in this case a number
@@ -64,6 +64,11 @@ const server = net.createServer((socket) => {
           break;
       }
     });
+
+    // If the forst parameter is a command, remove it
+    if (parameters[0] === command) {
+      parameters.shift();
+    }
     
     switch (command) {
       case commandsInterface.ping:
@@ -72,7 +77,12 @@ const server = net.createServer((socket) => {
         break;
       case commandsInterface.echo:
         console.log("Received ECHO from client", socket.remoteAddress);
-        socket.write(`$${parameters[0].length}${CRLF}${parameters[0]}${CRLF}`);
+        // If have parameters, return the first one
+        if (parameters.length > 0) {
+          socket.write(`$${parameters[0].length}${CRLF}${parameters[0]}${CRLF}`);
+        } else {
+          socket.write(`$0${CRLF}${CRLF}`);
+        }
         break;
       default:
         console.log("Command not found");

@@ -11,11 +11,25 @@ const values = new Map();
 const expire = new Map();
 const commands = new Map();
 
+
+var slaveconfig = {
+  host: "",
+  port: 0
+}
+
 var PORT = defaultValues.PORT;
+
+var type = "master";
 
 for (let i = 0; i < process.argv.length; i++) {
   if ((process.argv[i] === '-p' || process.argv[i] === '--port') && process.argv[i + 1]) {
     PORT = process.argv[i + 1];
+  }
+
+  if ((process.argv[i] === '--replicaof') && process.argv[i + 1] && process.argv[i + 2]) {
+    type = "slave";
+    slaveconfig.host = process.argv[i + 1];
+    slaveconfig.port = process.argv[i + 2];
   }
 }
 
@@ -30,6 +44,7 @@ for (const file of commandFiles) {
 
 // Handle connection
 const server = net.createServer((socket) => {
+  socket.isMaster = type === "master";
   // Log when a client connects, and log the client address
   console.log("Client connected", socket.remoteAddress);
 

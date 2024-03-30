@@ -6,7 +6,10 @@ const defaultCommands = {
     noEcho: `$0${CRLF}${CRLF}`,
     error: `-ERR${CRLF}`,
     null: `$-1${CRLF}`,
-    info: `$11${CRLF}role:master${CRLF}`,
+    info: {
+        master: `$11${CRLF}role:master${CRLF}`,
+        slave: `$10${CRLF}role:slave${CRLF}`
+    }
 }
 
 const defaultValues = {

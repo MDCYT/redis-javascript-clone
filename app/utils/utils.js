@@ -7,6 +7,9 @@ const formattedCommands = {
     },
     get(value) {
         return `$${value.length}${CRLF}${value}${CRLF}`;
+    },
+    info(isMaster) {
+        return isMaster ? defaultCommands.info.master : defaultCommands.info.slave;
     }
 }
 

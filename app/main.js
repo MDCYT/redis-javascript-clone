@@ -36,7 +36,7 @@ const server = net.createServer((socket) => {
   // Handle ping
   socket.on("data", (data) => {
 
-    const command = data.toString().match(regex.commandRegex)[0].split('\n')[1].replace('\r', '');
+    const command = data.toString().match(regex.commandRegex)[0].split('\n')[1].replace('\r', '').toLowerCase();
 
     let parameters = [];
 

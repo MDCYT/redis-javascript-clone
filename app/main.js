@@ -16,7 +16,7 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     if (data.toString().trim().toUpperCase().includes("PING")) {
       console.log("Received PING from client", socket.remoteAddress);
-      sendMsg(socket, "PONG");
+      sendMsg(socket, "+PONG");
     }
   });
 });

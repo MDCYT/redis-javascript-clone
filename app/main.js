@@ -5,6 +5,7 @@ const commandsInterface = require("./interfaces/commands");
 const CRLF = '\r\n'
 
 const values = new Map();
+const expire = new Map();
 
 // Handle connection
 const server = net.createServer((socket) => {
@@ -75,7 +76,16 @@ const server = net.createServer((socket) => {
         console.log("Received SET from client", socket.remoteAddress);
         // If have parameters, set the value
         if (parameters.length > 0) {
-          values.set(parameters[0], parameters[1]);
+          console.log(parameters)
+          // Check if the parameter have the expiration time, in seconds
+          if (parameters.length >= 3 && parameters[2]?.toLowerCase() === 'px' && parameters[3] && Number(parameters[3])) {
+            console.log("Setting expiration time", parameters[3]);
+            values.set(parameters[0], parameters[1]);
+            expire.set(parameters[0], new Date().getTime() + Number(parameters[3]));
+          } else {
+            values.set(parameters[0], parameters[1]);
+          }
+
           socket.write("+OK" + CRLF);
         } else {
           socket.write("-ERR" + CRLF);
@@ -85,8 +95,14 @@ const server = net.createServer((socket) => {
         console.log("Received GET from client", socket.remoteAddress);
         // If have parameters, get the value
         if (parameters.length > 0) {
-          console.log(parameters);
+          const expiration = expire.get(parameters[0]);
+          if (expiration && expiration < new Date().getTime()) {
+            values.delete(parameters[0]);
+            expire.delete(parameters[0]);
+          }
+
           const value = values.get(parameters[0]);
+          
           if (value) {
             socket.write(`$${value.length}${CRLF}${value}${CRLF}`);
           } else {

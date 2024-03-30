@@ -2,7 +2,9 @@
 
 const commands = {
     ping: 'ping',
-    echo: 'echo'
+    echo: 'echo',
+    set: 'set',
+    get: 'get',
 }
 
 module.exports = commands;

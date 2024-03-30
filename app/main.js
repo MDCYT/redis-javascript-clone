@@ -4,6 +4,8 @@ const commandsInterface = require("./interfaces/commands");
 
 const CRLF = '\r\n'
 
+const values = new Map();
+
 // Handle connection
 const server = net.createServer((socket) => {
   // Log when a client connects, and log the client address
@@ -43,26 +45,10 @@ const server = net.createServer((socket) => {
       // $3 => Type of data, in this case a number
       // $1 => Type of data, in this case a "boolean" (0 or 1)
       // $2 => Type of data, in this case a string
-      const parameterType = parameter.split('\n')[0].replace('$', '').trim();
       const parameterValue = parameter.split('\n')[1].replace('\r', '').trim();
+      
+      parameters.push(parameterValue);
 
-      switch (parameterType) {
-        case '1':
-          parameters.push(parameterValue === '1' ? true : false);
-          break;
-        case '2':
-          parameters.push(parameterValue);
-          break;
-        case '3':
-          parameters.push(parseInt(parameterValue));
-          break;
-        case '4':
-          parameters.push(parameterValue);
-          break;
-        default:
-          parameters.push(parameterValue);
-          break;
-      }
     });
 
     // If the forst parameter is a command, remove it
@@ -79,9 +65,35 @@ const server = net.createServer((socket) => {
         console.log("Received ECHO from client", socket.remoteAddress);
         // If have parameters, return the first one
         if (parameters.length > 0) {
+
           socket.write(`$${parameters[0].length}${CRLF}${parameters[0]}${CRLF}`);
         } else {
           socket.write(`$0${CRLF}${CRLF}`);
+        }
+        break;
+      case commandsInterface.set:
+        console.log("Received SET from client", socket.remoteAddress);
+        // If have parameters, set the value
+        if (parameters.length > 0) {
+          values.set(parameters[0], parameters[1]);
+          socket.write("+OK" + CRLF);
+        } else {
+          socket.write("-ERR" + CRLF);
+        }
+        break;
+      case commandsInterface.get:
+        console.log("Received GET from client", socket.remoteAddress);
+        // If have parameters, get the value
+        if (parameters.length > 0) {
+          console.log(parameters);
+          const value = values.get(parameters[0]);
+          if (value) {
+            socket.write(`$${value.length}${CRLF}${value}${CRLF}`);
+          } else {
+            socket.write("$-1" + CRLF);
+          }
+        } else {
+          socket.write("$-1" + CRLF);
         }
         break;
       default:

@@ -7,6 +7,14 @@ const CRLF = '\r\n'
 const values = new Map();
 const expire = new Map();
 
+var PORT = 6379;
+
+for (let i = 0; i < process.argv.length; i++) {
+  if ((process.argv[i] === '-p' || process.argv[i] === '--port') && process.argv[i + 1]) {
+    PORT = process.argv[i + 1];
+  }
+}
+
 // Handle connection
 const server = net.createServer((socket) => {
   // Log when a client connects, and log the client address
@@ -119,4 +127,4 @@ const server = net.createServer((socket) => {
   });
 });
 
-server.listen(6379, "127.0.0.1");
+server.listen(PORT, "127.0.0.1");
